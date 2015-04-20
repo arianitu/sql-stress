@@ -1,0 +1,8 @@
+[{
+	"name": "Insert 1 million random strings",
+	"query": "INSERT INTO my_test_table(t, v) VALUES(NOW(), ?)",
+	"values": ["randIntInclusive(0, 100)", "randChars('ABCDEFGHIJKLMNOPQURESTUVWXYZ', 10)]"],
+	"iterations": 1000000,
+	"chance": 50,
+	"run": false
+}]
