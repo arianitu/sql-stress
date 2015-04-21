@@ -10,32 +10,13 @@ import (
 	"runtime"
 	"time"
 	"os"
+	"math/rand"
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func worker(db *sql.DB, queries <-chan string, results chan<-int64, done chan<- bool) {
-	for query := range queries {
-		startTime := time.Now()
-		_, err := db.Exec(query)
-		elapsed := time.Since(startTime)
-		
-		if err != nil {
-			fmt.Println(err);
-			continue
-		}
-		
-		results <- elapsed.Nanoseconds()
-	}
-}
-
-func sink(results <-chan int64) {
-	// avg query time
-	for time := range results {
-		fmt.Println(time)
-	}
-}
-
 func main() {
+	rand.Seed(time.Now().Unix())
+	fmt.Println(runtime.NumCPU())
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	
 	var url = flag.String("url", "root:@/sql_stress_test", "A database url")
@@ -62,18 +43,19 @@ func main() {
 		return
 	}
 
+	
+	queryIn := make(chan Query)
+	sink := make(chan int64)
+	for i := 0; i < *workers; i++ {
+		go Worker(db, queryIn, sink)
+	}
+	go Sink(sink)
+	
 	if (*runFixtures == 1) {
 		ProcessFixtures(*fixtureLocation, db)
 	}
-	
-	queries := make(chan string)
-	results := make(chan int64)
-	done := make(chan bool)
-	for i := 0; i < *workers; i++ {
-		go worker(db, queries, results, done)
-	}
-	ProcessTasks(*taskLocation, db)
-	queries <- "SELECT NOW()"
-	<- done
+
+	ProcessTasks(*taskLocation, db, queryIn)
+	fmt.Println("Done!")
 }
 

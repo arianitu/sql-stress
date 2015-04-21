@@ -1,8 +1,15 @@
-[{
-	"name": "Insert 1 million random strings",
-	"query": "INSERT INTO my_test_table(t, v) VALUES(NOW(), ?)",
-	"values": ["randIntInclusive(0, 100)", "randChars('ABCDEFGHIJKLMNOPQURESTUVWXYZ', 10)]"],
-	"iterations": 1000000,
-	"chance": 50,
-	"run": false
-}]
+{
+	"steps": [{
+		
+		"name": "Insert 100 random integers",
+		"query": "INSERT INTO my_test_table (x) VALUES(?)",
+		"values": ["randIntInclusive(0, 100)"],
+		"iterations": 100
+	}, {
+		
+		"name": "Insert 10 strings",
+		"query": "INSERT INTO my_test_table_2 (x) VALUES(?)",
+		"values": ["randString(10, 50)"],
+		"iterations": 10
+	}]
+}
