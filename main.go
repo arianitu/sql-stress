@@ -16,7 +16,7 @@ import (
 
 func main() {
 	rand.Seed(time.Now().Unix())
-	fmt.Println(runtime.NumCPU())
+	fmt.Printf("Running on %v workers \n", runtime.NumCPU())
 	runtime.GOMAXPROCS(runtime.NumCPU())
 	
 	var url = flag.String("url", "root:@/sql_stress_test", "A database url")

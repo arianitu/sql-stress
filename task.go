@@ -44,8 +44,24 @@ type Step struct {
 	Query string
 	Values []string
 	Iterations int
+	Tables []string
 	Chance float64
 	Run bool
+}
+
+func PrintTableInfo(db *sql.DB, table string) {
+	s := MySQLTableSize{ Db: db, Table: table}
+	err := s.Init()
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	fmt.Printf(TabN(2) + "Table: %v\n", table)
+	fmt.Printf(TabN(3) + "table size: %v MB, index size: %v MB, avg row size: %v bytes, rows: %v \n",
+		s.GetTableSize() / 1000000,
+		s.GetIndexSize() / 1000000,
+		s.GetAvgRowSize,
+		s.GetRows())
 }
 
 func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
@@ -82,12 +98,17 @@ func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 		queryIn <- Query{Query: s.Query, Values: values, Done: sink }
 	}
 	wg.Wait()
-	
+
+	total := time.Duration(totalTime) * time.Nanosecond
 	avgDuration := time.Duration(totalTime / int64(s.Iterations)) * time.Nanosecond
 	bestDuration := time.Duration(best) * time.Nanosecond
 	worstDuration := time.Duration(worst) * time.Nanosecond
 	
-	fmt.Printf(TabN(2) + "Avg: %v Worst: %v Best: %v\n", avgDuration, worstDuration, bestDuration)
+	fmt.Printf(TabN(2) + "Avg: %v Worst: %v Best: %v Total: %v \n", avgDuration, worstDuration, bestDuration, total)
+	fmt.Println("")
+	for _, table := range s.Tables {
+		PrintTableInfo(db, table)
+	}
 	
 	return nil
 }
