@@ -1,22 +1,22 @@
 package main
 
 import (
-	"database/sql"
-	"os"
-	"strings"
-	"strconv"
-	"fmt"
-	"path/filepath"
 	"bufio"
-	"sort"
-	"path"
 	"bytes"
+	"database/sql"
+	"fmt"
 	"io/ioutil"
+	"os"
+	"path"
+	"path/filepath"
+	"sort"
+	"strconv"
+	"strings"
 )
 
 type ByTime []os.FileInfo
 
-func (a ByTime) Len() int  {
+func (a ByTime) Len() int {
 	return len(a)
 }
 func (a ByTime) Swap(i, j int) {
@@ -25,7 +25,7 @@ func (a ByTime) Swap(i, j int) {
 
 func (a ByTime) Less(i, j int) bool {
 	formatString := "Failed to sort fixture directory. File %s is not in the format name_integertimestamp"
-	
+
 	nameA := strings.TrimSuffix(a[i].Name(), filepath.Ext(a[i].Name()))
 	timeA, err := strconv.Atoi(strings.Split(nameA, "_")[1])
 	if err != nil {
@@ -60,7 +60,7 @@ func ProcessFixtures(fixtureLocation string, db *sql.DB) {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	
+
 	sort.Sort(ByTime(filesInOrder))
 	for _, fileInfo := range filesInOrder {
 		if fileInfo.IsDir() {
@@ -81,11 +81,11 @@ func ProcessFixtures(fixtureLocation string, db *sql.DB) {
 				fmt.Println(err)
 				fmt.Println("Cannot continue, exiting")
 				os.Exit(1)
-			}			
+			}
 		}
 		if err := scanner.Err(); err != nil {
-            fmt.Printf("Invalid input: %s", err)
+			fmt.Printf("Invalid input: %s", err)
 		}
-		
+
 	}
 }

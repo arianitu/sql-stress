@@ -5,38 +5,37 @@ import (
 )
 
 type TableSize interface {
-	GetTableSize() (int64)
-	GetIndexSize() (int64)
-	GetAvgRowSize() (int64)
-	GetRows() (int64)
+	GetTableSize() int64
+	GetIndexSize() int64
+	GetAvgRowSize() int64
+	GetRows() int64
 }
 
-
 type MySQLTableSize struct {
-	Table string
-	Db *sql.DB
+	Table  string
+	Db     *sql.DB
 	status MySQLTableStatus
 }
 
 type MySQLTableStatus struct {
-	Name string
-	Engine string
-	Version int64
-	RowFormat string
-	Rows int64
-	AvgRowLength int64
-	DataLength int64
+	Name          string
+	Engine        string
+	Version       int64
+	RowFormat     string
+	Rows          int64
+	AvgRowLength  int64
+	DataLength    int64
 	MaxDataLength int64
-	IndexLength int64
-	DataFree uint64
+	IndexLength   int64
+	DataFree      uint64
 	AutoIncrement sql.NullInt64
-	CreateTime sql.NullString
-	UpdateTime sql.NullString
-	CheckTime sql.NullString
-	Collation sql.NullString
-	Checksum sql.NullString
+	CreateTime    sql.NullString
+	UpdateTime    sql.NullString
+	CheckTime     sql.NullString
+	Collation     sql.NullString
+	Checksum      sql.NullString
 	CreateOptions string
-	Comment string
+	Comment       string
 }
 
 func (m *MySQLTableSize) Init() error {
@@ -44,8 +43,8 @@ func (m *MySQLTableSize) Init() error {
 	if err != nil {
 		return err
 	}
-	
-	err = m.Db.QueryRow("SHOW TABLE STATUS LIKE '" + m.Table + "'").Scan(
+
+	err = m.Db.QueryRow("SHOW TABLE STATUS LIKE '"+m.Table+"'").Scan(
 		&m.status.Name,
 		&m.status.Engine,
 		&m.status.Version,
@@ -67,7 +66,7 @@ func (m *MySQLTableSize) Init() error {
 	if err != nil {
 		return err
 	}
-	
+
 	return nil
 }
 

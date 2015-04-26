@@ -1,15 +1,15 @@
 {
 	"steps": [{
 		"tables": ["my_test_table"],
-		"name": "Insert 100 random integers",
+		"name": "Insert 1,000,000 random integers",
 		"query": "INSERT INTO my_test_table (x) VALUES(?)",
 		"values": ["randIntInclusive(0, 100)"],
-		"iterations": 100
+		"iterations": 1000000
 	}, {
 		"tables": ["my_test_table_2"],
-		"name": "Insert 10 strings",
+		"name": "Insert 1,000,000 strings",
 		"query": "INSERT INTO my_test_table_2 (x) VALUES(?)",
 		"values": ["randString(10, 50)"],
-		"iterations": 10
+		"iterations": 1000000
 	}]
 }
