@@ -2,7 +2,12 @@ package main
 
 import (
 	"math/rand"
+	"strings"
 )
+
+func TabN(n int) string {
+	return strings.Repeat("\t", n)
+}
 
 var letters = []rune("abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ")
 func RandomString(min, max int) string {

@@ -5,16 +5,16 @@ import (
 	"fmt"
 	"time"
 	"os"
-	"sync"
 )
 
 type Query struct {
+	Id string
 	Query string
 	Values []interface{}
-	WaitGroup *sync.WaitGroup
+	Done chan<- int64
 }
 
-func Worker(db *sql.DB, queryIn <-chan Query, sink chan<- int64) {
+func Worker(db *sql.DB, queryIn <-chan Query) {
 	for query := range queryIn {
 		startTime := time.Now()
 		_, err := db.Exec(query.Query, query.Values...)
@@ -25,15 +25,6 @@ func Worker(db *sql.DB, queryIn <-chan Query, sink chan<- int64) {
 			os.Exit(1)
 		}
 		
-		sink <- elapsed.Nanoseconds()
-		query.WaitGroup.Done()
+		query.Done <- elapsed.Nanoseconds()
 	}
 }
-
-func Sink(sink <-chan int64) {
-	
-	for _ = range sink {
-		// avg the results
-	}
-}
-

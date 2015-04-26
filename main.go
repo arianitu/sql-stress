@@ -45,11 +45,9 @@ func main() {
 
 	
 	queryIn := make(chan Query)
-	sink := make(chan int64)
 	for i := 0; i < *workers; i++ {
-		go Worker(db, queryIn, sink)
+		go Worker(db, queryIn)
 	}
-	go Sink(sink)
 	
 	if (*runFixtures == 1) {
 		ProcessFixtures(*fixtureLocation, db)

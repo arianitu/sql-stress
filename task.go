@@ -13,6 +13,8 @@ import (
 	"strconv"
 	"math/rand"
 	"sync"
+	"time"
+	"math"
 )
 
 var (
@@ -48,18 +50,44 @@ type Step struct {
 
 func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 
-	fmt.Println("     " + s.Name)
+	fmt.Println(TabN(1) + s.Name)
 
+	
 	wg := &sync.WaitGroup{}
 	wg.Add(s.Iterations)
+	
+	sink := make(chan int64)
+	
+	var worst int64 = 0
+	var best int64 = math.MaxInt64
+	var totalTime int64 = 0
+	go func() {
+		for t := range sink {
+			totalTime += t
+			if (t > worst) {
+				worst = t
+			}
+			if (t < best) {
+				best = t
+			}
+			wg.Done()
+		}
+	}()
+	
 	for i := 0; i < s.Iterations; i++ {
 		values, err := s.ResolveValues()
 		if err != nil {
 			return err
 		}
-		queryIn <- Query{Query: s.Query, Values: values, WaitGroup: wg }
+		queryIn <- Query{Query: s.Query, Values: values, Done: sink }
 	}
 	wg.Wait()
+	
+	avgDuration := time.Duration(totalTime / int64(s.Iterations)) * time.Nanosecond
+	bestDuration := time.Duration(best) * time.Nanosecond
+	worstDuration := time.Duration(worst) * time.Nanosecond
+	
+	fmt.Printf(TabN(2) + "Avg: %v Worst: %v Best: %v\n", avgDuration, worstDuration, bestDuration)
 	
 	return nil
 }
