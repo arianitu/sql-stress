@@ -80,7 +80,7 @@ func (m *MySQLTableSize) GetIndexSize() int64 {
 }
 
 func (m *MySQLTableSize) GetAvgRowSize() int64 {
-	return m.status.DataLength
+	return m.status.AvgRowLength
 }
 
 func (m *MySQLTableSize) GetRows() int64 {

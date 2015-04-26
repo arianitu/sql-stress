@@ -60,7 +60,7 @@ func PrintTableInfo(db *sql.DB, table string) {
 	fmt.Printf(TabN(3) + "table size: %v MB, index size: %v MB, avg row size: %v bytes, rows: %v \n",
 		s.GetTableSize() / 1000000,
 		s.GetIndexSize() / 1000000,
-		s.GetAvgRowSize,
+		s.GetAvgRowSize(),
 		s.GetRows())
 }
 
