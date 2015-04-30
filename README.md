@@ -10,12 +10,13 @@ Stress a SQL server by defining tasks using JSON.
 You want to know how your queries scale when you get to 10+ million rows. How long do inserts take? How long do selects take? How big is my table (in terms of disk space) in the worse case? How big are my indexes? (in terms of disk space)
 
 # Example output
-
+    Processing task: task_1.json
 	Insert 300,000 random integers
 		Avg: 1.308625ms Worst: 140.21674ms Best: 511.712µs Total: 6m32.587658685s 
 
 		Table: my_test_table
 			table size: 9 MB, index size: 0 MB, avg row size: 33 bytes, rows: 299730 
+			
 	Insert 300,000 strings
 		Avg: 1.496862ms Worst: 35.539345ms Best: 629.338µs Total: 7m29.058658422s 
 
@@ -82,7 +83,7 @@ Here is an example of a task:
   Prepared statement to execute. Question marks are safely replaced by the data you supply to the values property.
   
 ### Property: values (Array)
-  Valid values in the array are strings, ints, and bools. If you need to use NOW(), do it in the query statement.
+  Valid values in the array are strings, ints, and bools and functions*. If you need to use NOW(), do it in the query statement.
   
 ##### Functions
   You can supply functions in the values array when you need random data. Functions that currently exist are:
