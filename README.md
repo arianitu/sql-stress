@@ -9,6 +9,23 @@ Stress a SQL server by defining tasks using JSON.
 
 You want to know how your queries scale when you get to 10+ million rows. How long do inserts take? How long do selects take? How big is my table (in terms of disk space) in the worse case? How big are my indexes? (in terms of disk space)
 
+# Example output
+
+	Insert 300,000 random integers
+		Avg: 1.308625ms Worst: 140.21674ms Best: 511.712µs Total: 6m32.587658685s 
+
+		Table: my_test_table
+			table size: 9 MB, index size: 0 MB, avg row size: 33 bytes, rows: 299730 
+	Insert 300,000 strings
+		Avg: 1.496862ms Worst: 35.539345ms Best: 629.338µs Total: 7m29.058658422s 
+
+		Table: my_test_table_2
+			table size: 19 MB, index size: 19 MB, avg row size: 65 bytes, rows: 298730 
+
+Notice that rows is close, but not exact. This is because these stats are pulled from "show table status" to get speedy results.
+
+
+
 
 # Fixtures
 
@@ -72,7 +89,10 @@ Here is an example of a task:
   
     randIntInclusive(min, max)
     randString(minStringLength, maxStringLength)
-  
+    
+### Property: iterations
+    The number of times to run the query. If you use functions inside values, they're computed for each iteration.
+
 
 
 
