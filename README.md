@@ -85,13 +85,13 @@ Here is an example of a task:
 ### Property: values (Array)
   Valid values in the array are strings, ints, and bools and functions*. If you need to use NOW(), do it in the query statement.
   
-##### Functions
+##### Functions (String)
   You can supply functions in the values array when you need random data. Functions that currently exist are:
   
     randIntInclusive(min, max)
     randString(minStringLength, maxStringLength)
     
-### Property: iterations
+### Property: iterations (Integer)
     The number of times to run the query. If you use functions inside values, they're computed for each iteration.
 
 
