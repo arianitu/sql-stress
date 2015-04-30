@@ -92,7 +92,8 @@ Here is an example of a task:
     randString(minStringLength, maxStringLength)
     
 ### Property: iterations (Integer)
-    The number of times to run the query. If you use functions inside values, they're computed for each iteration.
+   The number of times to run the query. If you use functions inside values, they're computed for each iteration. Iterations are run in parallel if possible (sql-stress has a worker command line option)
+   
 
 
 
