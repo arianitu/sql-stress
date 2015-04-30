@@ -1,2 +1,80 @@
+# Notice
+
+This is unstable and is in heavy development. 
+
 # sql-stress
-Stress a SQL server by defining tasks using JSON and pre-loading the DB using .sql files.
+Stress a SQL server by defining tasks using JSON.
+
+# Problem statement
+
+You want to know how your queries scale when you get to 10+ million rows. How long do inserts take? How long do selects take? How big is my table (in terms of disk space) in the worse case? How big are my indexes? (in terms of disk space)
+
+
+# Fixtures
+
+Fixtures are basically .sql files that run in order. This is where you would put your table definitions in. You must have a folder named fixtures in the directory that you're running sql-stress.
+
+The file names inside the fixtures folder should be in the format: name_order. Name must be a string, and order must be an integer.
+
+Example:
+
+    ./fixtures
+    ./fixtures/players_1.sql
+    ./fixtures/items_2.sql
+  
+It would run players_1.sql, then items_2.sql. 
+
+Queries inside .sql files must be separated using a semicolon. _All_ queries must have a semicolon, including the last one (or it will not be executed)
+
+# Tasks
+
+Tasks are defined using JSON. Each task has a series of steps that run in order. You can have multiple tasks and each task will run in order.
+
+You must have a folder named tasks in the directory that you're running sql-stress. The file names inside the fixtures folder should be in the format: name_order. Name must be a string, and order must be an integer.
+
+Example:
+
+    ./tasks
+    ./tasks/players_1.json
+    ./tasks/items_2.json
+    
+Here is an example of a task:
+
+    {
+    	"steps": [{
+    		"tables": ["my_test_table"],
+    		"name": "Insert 1,000,000 random integers",
+    		"query": "INSERT INTO my_test_table (x) VALUES(?)",
+    		"values": ["randIntInclusive(0, 100)"],
+    		"iterations": 1000000
+    	}, {
+    		"tables": ["my_test_table_2"],
+    		"name": "Insert 1,000,000 strings",
+    		"query": "INSERT INTO my_test_table_2 (x) VALUES(?)",
+    		"values": ["randString(10, 50)"],
+    		"iterations": 100000
+    	}]
+    }
+
+# Task Documentation
+
+### Property: tables (Array)
+  Tables to output metrics for when a step is completed. 
+  
+### Property: query (String)
+  Prepared statement to execute. Question marks are safely replaced by the data you supply to the values property.
+  
+### Property: values (Array)
+  Valid values in the array are strings, ints, and bools. If you need to use NOW(), do it in the query statement.
+  
+##### Functions
+  You can supply functions in the values array when you need random data. Functions that currently exist are:
+  
+    randIntInclusive(min, max)
+    randString(minStringLength, maxStringLength)
+  
+
+
+
+
+
