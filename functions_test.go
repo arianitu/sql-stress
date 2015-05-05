@@ -32,3 +32,24 @@ func TestTabN(t *testing.T) {
 		t.Errorf("expected to be %v, got %v", expected, tabs)
 	}
 }
+
+func TestResolveString(t *testing.T) {
+	value, err := resolveString("randIntInclusive(10, 10)")
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, ok := value.(int)
+	if !ok  {
+		t.Fatal("Expected randIntInclusive to return an int!")
+	}
+
+	value, err = resolveString("randString(10, 15)")
+	_, ok = value.(string)
+	if !ok  {
+		t.Fatal("Expected randString to return a string!")
+	}
+	
+	if err != nil {
+		t.Fatal(err)
+	}
+}

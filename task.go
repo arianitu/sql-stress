@@ -10,7 +10,6 @@ import (
 	"os"
 	"path"
 	"sort"
-	"strconv"
 	"sync"
 	"time"
 )
@@ -107,38 +106,6 @@ func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 	}
 
 	return nil
-}
-
-func resolveString(value string) (interface{}, error) {
-	for _, exp := range valueFunctions {
-		if !exp.MatchString(value) {
-			continue
-		}
-		params := exp.FindStringSubmatch(value)
-
-		if exp == randIntInclusive {
-			min, err := strconv.Atoi(params[1])
-			if err != nil {
-				return nil, fmt.Errorf("First parameter of randIntIncusive must be an integer! Got: %v", params[1])
-			}
-			max, err := strconv.Atoi(params[2])
-			if err != nil {
-				return nil, fmt.Errorf("Second parameter of randIntIncusive must be an integer! Got: %v", params[2])
-			}
-			return RandomIntInclusive(min, max), nil
-		} else if exp == randString {
-			min, err := strconv.Atoi(params[1])
-			if err != nil {
-				return nil, fmt.Errorf("First parameter of randString must be an integer! Got: %v", params[1])
-			}
-			max, err := strconv.Atoi(params[2])
-			if err != nil {
-				return nil, fmt.Errorf("Second parameter of randString must be an integer! Got: %v", params[2])
-			}
-			return RandomString(min, max), nil
-		}
-	}
-	return value, nil
 }
 
 // ResolveValues goes through each Task.Values and computes that
