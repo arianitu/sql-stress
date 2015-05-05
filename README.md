@@ -3,7 +3,7 @@
 This is unstable and is in heavy development. 
 
 # sql-stress
-Stress a SQL server by defining tasks using JSON.
+Stress a SQL server by defining tasks using JSON. It currently supports mysql, postgres, and sqlite. 
 
 # Problem statement
 
@@ -24,7 +24,6 @@ You want to know how your queries scale when you get to 10+ million rows. How lo
 			table size: 19 MB, index size: 19 MB, avg row size: 65 bytes, rows: 298730 
 
 Notice that rows is close, but not exact. This is because these stats are pulled from "show table status" to get speedy results.
-
 
 
 
@@ -75,15 +74,15 @@ Here is an example of a task:
     }
 
 # Task Documentation
-
+  
 ### Property: tables (Array)
   Tables to output metrics for when a step is completed. 
   
 ### Property: query (String)
-  Prepared statement to execute. Question marks are safely replaced by the data you supply to the values property.
+  Prepared statement to execute. MySQL tends to use ?, and Postgres tends to use $1,$2..
   
 ### Property: values (Array)
-  Valid values in the array are strings, ints, and bools and functions*. If you need to use NOW(), do it in the query statement.
+  Valid values in the array are strings, ints, and bools and functions*. If you need to use NOW(), do it in the query statement. 
   
 ##### Functions (String)
   You can supply functions in the values array when you need random data. Functions that currently exist are:
@@ -94,7 +93,8 @@ Here is an example of a task:
 ### Property: iterations (Integer)
    The number of times to run the query. If you use functions inside values, they're computed for each iteration. Iterations are run in parallel if possible (sql-stress has a worker command line option)
    
-
+### Property: ignore (Bool)
+  Skip this task/step
 
 
 

@@ -7,30 +7,26 @@ import (
 	"io"
 	"io/ioutil"
 	"math"
-	"math/rand"
 	"os"
 	"path"
-	"regexp"
 	"sort"
 	"strconv"
 	"sync"
 	"time"
 )
 
-var (
-	randIntInclusive = regexp.MustCompile("^randIntInclusive\\((\\d+)+,\\s*(\\d+)+\\)$")
-	randString       = regexp.MustCompile("^randString\\((\\d+)+,\\s*(\\d+)+\\)$")
-	valueFunctions   = [...]*regexp.Regexp{randIntInclusive, randString}
-)
-
 type Task struct {
 	Url      string
 	Parallel string
+	Ignore   bool
 	Steps    []Step
 }
 
 func (t *Task) Step(db *sql.DB, queryIn chan<- Query) {
 	for _, step := range t.Steps {
+		if step.Ignore {
+			continue
+		}
 		err := step.Execute(db, queryIn)
 		if err != nil {
 			fmt.Println(err)
@@ -45,6 +41,7 @@ type Step struct {
 	Values     []string
 	Iterations int
 	Tables     []string
+	Ignore     bool
 	Chance     float64
 	Run        bool
 }
@@ -134,9 +131,8 @@ func (s *Step) ResolveValues() ([]interface{}, error) {
 				if err != nil {
 					return nil, fmt.Errorf("Second parameter of randIntIncusive must be an integer! Got: %v", params[2])
 				}
-
-				r := rand.Intn(max-min) + min
-				values = append(values, r)
+				
+				values = append(values, RandomIntInclusive(min, max))
 			} else if exp == randString {
 				min, err := strconv.Atoi(params[1])
 				if err != nil {
@@ -180,6 +176,9 @@ func ProcessTasks(taskLocation string, db *sql.DB, queryIn chan<- Query) {
 			fmt.Println(err)
 			fmt.Println("Cannot continue, exiting")
 			os.Exit(1)
+		}
+		if task.Ignore {
+			continue
 		}
 		task.Step(db, queryIn)
 	}

@@ -3,6 +3,13 @@ package main
 import (
 	"math/rand"
 	"strings"
+	"regexp"
+)
+
+var (
+	randIntInclusive = regexp.MustCompile("^randIntInclusive\\((\\d+)+,\\s*(\\d+)+\\)$")
+	randString       = regexp.MustCompile("^randString\\((\\d+)+,\\s*(\\d+)+\\)$")
+	valueFunctions   = [...]*regexp.Regexp{randIntInclusive, randString}
 )
 
 func TabN(n int) string {
@@ -18,4 +25,12 @@ func RandomString(min, max int) string {
 		b[i] = letters[rand.Intn(len(letters))]
 	}
 	return string(b)
+}
+
+func RandomIntInclusive(min, max int) int {
+	return rand.Intn(max-min + 1) + min
+}
+
+func RandomIntExclusive(min, max int) int {
+	return rand.Intn(max-min) + min
 }
