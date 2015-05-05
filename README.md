@@ -82,7 +82,7 @@ Here is an example of a task:
   Prepared statement to execute. MySQL tends to use ?, and Postgres tends to use $1,$2..
   
 ### Property: values (Array)
-  Valid values in the array are strings, ints, and bools and functions*. If you need to use NOW(), do it in the query statement. 
+  Valid values in the array are string, float64, bool and functions*. If you need to use NOW(), do it in the query statement. 
   
 ##### Functions (String)
   You can supply functions in the values array when you need random data. Functions that currently exist are:

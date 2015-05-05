@@ -89,3 +89,4 @@ func ProcessFixtures(fixtureLocation string, db *sql.DB) {
 
 	}
 }
+

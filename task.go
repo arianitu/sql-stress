@@ -38,7 +38,7 @@ func (t *Task) Step(db *sql.DB, queryIn chan<- Query) {
 type Step struct {
 	Name       string
 	Query      string
-	Values     []string
+	Values     []interface{}
 	Iterations int
 	Tables     []string
 	Ignore     bool
@@ -109,42 +109,58 @@ func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 	return nil
 }
 
+func resolveString(value string) (interface{}, error) {
+	for _, exp := range valueFunctions {
+		if !exp.MatchString(value) {
+			continue
+		}
+		params := exp.FindStringSubmatch(value)
+
+		if exp == randIntInclusive {
+			min, err := strconv.Atoi(params[1])
+			if err != nil {
+				return nil, fmt.Errorf("First parameter of randIntIncusive must be an integer! Got: %v", params[1])
+			}
+			max, err := strconv.Atoi(params[2])
+			if err != nil {
+				return nil, fmt.Errorf("Second parameter of randIntIncusive must be an integer! Got: %v", params[2])
+			}
+			return RandomIntInclusive(min, max), nil
+		} else if exp == randString {
+			min, err := strconv.Atoi(params[1])
+			if err != nil {
+				return nil, fmt.Errorf("First parameter of randString must be an integer! Got: %v", params[1])
+			}
+			max, err := strconv.Atoi(params[2])
+			if err != nil {
+				return nil, fmt.Errorf("Second parameter of randString must be an integer! Got: %v", params[2])
+			}
+			return RandomString(min, max), nil
+		}
+	}
+	return value, nil
+}
+
 // ResolveValues goes through each Task.Values and computes that
 // requested function if it exists. If that function does not exist,
 // it will return an error.
 func (s *Step) ResolveValues() ([]interface{}, error) {
 	values := make([]interface{}, 0)
-	for _, value := range s.Values {
-
-		for _, exp := range valueFunctions {
-			if !exp.MatchString(value) {
-				continue
+	for _, anything := range s.Values {
+		switch v := anything.(type) {
+		case string:
+			r, err := resolveString(v)
+			if err != nil {
+				return nil, err
 			}
-			params := exp.FindStringSubmatch(value)
+			values = append(values, r)
+		case float64:
+			values = append(values, v)
+		case bool:
+			values = append(values, v)
+		default:
+			return nil, fmt.Errorf("Value array in Task.step must be a string, float64, or bool")
 
-			if exp == randIntInclusive {
-				min, err := strconv.Atoi(params[1])
-				if err != nil {
-					return nil, fmt.Errorf("First parameter of randIntIncusive must be an integer! Got: %v", params[1])
-				}
-				max, err := strconv.Atoi(params[2])
-				if err != nil {
-					return nil, fmt.Errorf("Second parameter of randIntIncusive must be an integer! Got: %v", params[2])
-				}
-				
-				values = append(values, RandomIntInclusive(min, max))
-			} else if exp == randString {
-				min, err := strconv.Atoi(params[1])
-				if err != nil {
-					return nil, fmt.Errorf("First parameter of randString must be an integer! Got: %v", params[1])
-				}
-				max, err := strconv.Atoi(params[2])
-				if err != nil {
-					return nil, fmt.Errorf("Second parameter of randString must be an integer! Got: %v", params[2])
-				}
-				values = append(values, RandomString(min, max))
-
-			}
 		}
 	}
 	return values, nil
