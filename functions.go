@@ -1,11 +1,11 @@
 package main
 
 import (
+	"fmt"
 	"math/rand"
-	"strings"
 	"regexp"
 	"strconv"
-	"fmt"
+	"strings"
 )
 
 var (
@@ -30,7 +30,7 @@ func RandomString(min, max int) string {
 }
 
 func RandomIntInclusive(min, max int) int {
-	return rand.Intn(max-min + 1) + min
+	return rand.Intn(max-min+1) + min
 }
 
 func RandomIntExclusive(min, max int) int {

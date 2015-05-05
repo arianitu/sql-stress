@@ -15,14 +15,14 @@ func TestRandIntInclusiveMin(t *testing.T) {
 	l := RandomIntInclusive(10, 10)
 	if l != 10 {
 		t.Errorf("min length is wrong, got %v expected %v", l, 10)
-	}	
+	}
 }
 
 func TestRandIntExclusiveMin(t *testing.T) {
 	l := RandomIntExclusive(10, 11)
 	if l != 10 {
 		t.Errorf("min length is wrong, got %v expected at least %v", l, 10)
-	}	
+	}
 }
 
 func TestTabN(t *testing.T) {
@@ -39,16 +39,16 @@ func TestResolveString(t *testing.T) {
 		t.Fatal(err)
 	}
 	_, ok := value.(int)
-	if !ok  {
+	if !ok {
 		t.Fatal("Expected randIntInclusive to return an int!")
 	}
 
 	value, err = resolveString("randString(10, 15)")
 	_, ok = value.(string)
-	if !ok  {
+	if !ok {
 		t.Fatal("Expected randString to return a string!")
 	}
-	
+
 	if err != nil {
 		t.Fatal(err)
 	}

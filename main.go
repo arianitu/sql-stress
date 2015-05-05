@@ -27,7 +27,7 @@ func main() {
     sqlite: /some/location/test.db
 
 `)
-	
+
 	var vendor = flag.String("vendor", "mysql", "The sql vendor. Possible values are: mysql, postgres, sqlite")
 	flag.Parse()
 
@@ -39,7 +39,7 @@ func main() {
 		os.Exit(1)
 		return
 	}
-	
+
 	db.SetMaxOpenConns(runtime.NumCPU())
 	queryIn := make(chan Query)
 	for i := 0; i < *workers; i++ {

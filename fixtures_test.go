@@ -2,13 +2,13 @@ package main
 
 import (
 	"bufio"
-	"testing"
-	"io/ioutil"
-	"path"
-	"os"
 	"fmt"
+	"io/ioutil"
+	"os"
+	"path"
 	"sort"
 	"strings"
+	"testing"
 )
 
 func TestFileSorting(t *testing.T) {
@@ -16,8 +16,8 @@ func TestFileSorting(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	filesToMake := [...]string {"test_2.sql", "test_1.sql", "test_3.sql", "test_10.sql", "test_100.sql"}
-	expected := [...]string {"test_1.sql", "test_2.sql", "test_3.sql", "test_10.sql", "test_100.sql"}
+	filesToMake := [...]string{"test_2.sql", "test_1.sql", "test_3.sql", "test_10.sql", "test_100.sql"}
+	expected := [...]string{"test_1.sql", "test_2.sql", "test_3.sql", "test_10.sql", "test_100.sql"}
 
 	for _, name := range filesToMake {
 		ioutil.WriteFile(path.Join(dir, name), []byte{0}, os.ModeAppend)
@@ -37,7 +37,7 @@ func TestFileSorting(t *testing.T) {
 			t.Fatalf("Directory not sorted properly, got %v, expected %v", fileInfo.Name(), expected[index])
 		}
 	}
-	
+
 	err = os.RemoveAll(dir)
 	if err != nil {
 		fmt.Println("Failed to cleanup temporary directory!")
@@ -49,10 +49,10 @@ func TestSemicolonSplit(t *testing.T) {
 	if err != nil {
 		t.Fatal(err)
 	}
-	expected := [...]string {"SELECT * FROM a", "SELECT * FROM b", "SELECT * FROM c"}
+	expected := [...]string{"SELECT * FROM a", "SELECT * FROM b", "SELECT * FROM c"}
 	file.WriteString(strings.Join(expected[:], ";") + ";")
 	file.Seek(0, 0)
-	
+
 	scanner := bufio.NewScanner(file)
 	scanner.Split(SemicolonSplit)
 	i := 0
