@@ -58,6 +58,10 @@ Example:
 Here is an example of a task:
 
     {
+		"conn": {
+			"vendor": "mysql",
+			"url": "root:@/sql_stress_test"
+		},
     	"steps": [{
     		"tables": ["my_test_table"],
     		"name": "Insert 1,000,000 random integers",
@@ -74,7 +78,17 @@ Here is an example of a task:
     }
 
 # Task Documentation
-  
+
+### Property: conn (Object)
+
+	vendor (String): mysql, postgres, sqlite
+	url (String):
+		mysql: username:password@localhost/dbname
+		postgres: postgres://username:password@localhost/dbname
+		sqlite: /some/location/test.db
+
+## Steps (Object)
+
 ### Property: tables (Array)
   Tables to output metrics for when a step is completed. 
   
