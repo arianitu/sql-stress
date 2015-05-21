@@ -93,7 +93,7 @@ If you don't provide conn, the connection info that is passed via command line a
 - postgres: postgres://username:password@localhost/dbname
 - sqlite: /some/location/test.db
 
-## Steps (Object)
+## Steps (Array\<Object\>)
 
 ### Property: tables (Array)
   Tables to output metrics for when a step is completed. 
