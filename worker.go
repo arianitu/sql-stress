@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"os"
 	"time"
+	"runtime"
 )
 
 type Query struct {
@@ -27,4 +28,18 @@ func Worker(db *sql.DB, queryIn <-chan Query) {
 
 		query.Done <- elapsed.Nanoseconds()
 	}
+}
+
+func SpawnWorkers(vendor string, url string, workers int) (chan<- Query, *sql.DB, error) {
+	queryIn := make(chan Query)
+	db, err := sql.Open(vendor, url)
+	if err != nil {
+		return nil, nil, err
+	}
+
+	db.SetMaxOpenConns(runtime.NumCPU())
+	for i := 0; i < workers; i++ {
+		go Worker(db, queryIn)
+	}
+	return queryIn, db, nil
 }

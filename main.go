@@ -1,7 +1,6 @@
 package main
 
 import (
-	"database/sql"
 	"flag"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
@@ -12,6 +11,15 @@ import (
 	"runtime"
 	"time"
 )
+
+type Settings struct {
+	Workers int
+	RunFixtures int
+	FixtureLocation string
+	TaskLocation string
+	Vendor string
+	Url string
+}
 
 func main() {
 	rand.Seed(time.Now().Unix())
@@ -30,26 +38,27 @@ func main() {
 
 	var vendor = flag.String("vendor", "mysql", "The sql vendor. Possible values are: mysql, postgres, sqlite")
 	flag.Parse()
+	
+	settings := &Settings {
+		Workers: *workers,
+		RunFixtures: *runFixtures,
+		FixtureLocation: *fixtureLocation,
+		TaskLocation: *taskLocation,
+		Vendor: *vendor,
+		Url: *url,
+	}
 
-	fmt.Printf("Running on %v workers \n", *workers)
-	db, err := sql.Open(*vendor, *url)
+	queryIn, db, err := SpawnWorkers(settings.Vendor, settings.Url, settings.Workers)
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("Cannot continue, exiting")
 		os.Exit(1)
-		return
 	}
-
-	db.SetMaxOpenConns(runtime.NumCPU())
-	queryIn := make(chan Query)
-	for i := 0; i < *workers; i++ {
-		go Worker(db, queryIn)
-	}
-
+	
 	if *runFixtures == 1 {
 		ProcessFixtures(*fixtureLocation, db)
 	}
 
-	ProcessTasks(*taskLocation, db, queryIn)
+	ProcessTasks(settings, db, queryIn)
 	fmt.Println("Done!")
 }

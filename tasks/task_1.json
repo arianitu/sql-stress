@@ -1,4 +1,9 @@
 {
+	"conn": {
+		"vendor": "mysql",
+		"url": "root:@/sql_stress_test"
+	},
+	
 	"steps": [{
 		"tables": ["my_test_table"],
 		"name": "Insert 1,000,000 random integers",
