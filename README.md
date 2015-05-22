@@ -81,13 +81,19 @@ Here is an example of a task:
 
 ### Property: conn (Object)
 
-	vendor (String): mysql, postgres, sqlite
-	url (String):
-		mysql: username:password@localhost/dbname
-		postgres: postgres://username:password@localhost/dbname
-		sqlite: /some/location/test.db
+If you don't provide conn, the connection info that is passed via command line arguments is used by default.
 
-## Steps (Object)
+#### vendor (String): 
+- mysql
+- postgres
+- sqlite
+
+#### url (String):
+- mysql: username:password@localhost/dbname
+- postgres: postgres://username:password@localhost/dbname
+- sqlite: /some/location/test.db
+
+## Steps (Array\<Object\>)
 
 ### Property: tables (Array)
   Tables to output metrics for when a step is completed. 
