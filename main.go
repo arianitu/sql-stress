@@ -48,7 +48,7 @@ func main() {
 		Url: *url,
 	}
 
-	queryIn, db, err := SpawnWorkers(settings.Vendor, settings.Url, settings.Workers)
+	queryIn, db, err := SpawnWorkers(settings.Vendor, settings.Url, settings.Workers, runtime.NumCPU())
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("Cannot continue, exiting")

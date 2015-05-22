@@ -1,6 +1,7 @@
 package main
 
 import (
+	"runtime"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -18,6 +19,7 @@ type Conn struct {
 	Vendor string
 	Url string
 	Workers int
+	MaxOpenConn int
 }
 
 type Task struct {
@@ -70,6 +72,11 @@ func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 
 	fmt.Println(TabN(1) + s.Name)
 
+	// iterations default value is 1
+	if s.Iterations <= 0 {
+		s.Iterations = 1
+	}
+	
 	wg := &sync.WaitGroup{}
 	wg.Add(s.Iterations)
 
@@ -176,8 +183,11 @@ func ProcessTasks(settings *Settings, db *sql.DB, queryIn chan<- Query) {
 			if workers <= 0 {
 				workers = settings.Workers
 			}
-			
-			taskQueryIn, taskDb, err := SpawnWorkers(task.Conn.Vendor, task.Conn.Url, workers)
+			maxOpenConn := task.Conn.MaxOpenConn
+			if maxOpenConn <= 0 {
+				maxOpenConn = runtime.NumCPU()
+			}
+			taskQueryIn, taskDb, err := SpawnWorkers(task.Conn.Vendor, task.Conn.Url, workers, maxOpenConn)
 			if err != nil {
 				fmt.Println(err)
 				fmt.Println("Cannot continue, exiting")
