@@ -79,6 +79,9 @@ Here is an example of a task:
 
 # Task Documentation
 
+### Property: skip (Bool)
+  Skip this task
+  
 ### Property: conn (Object)
 
 If you don't provide conn, the connection info that is passed via command line arguments is used by default.
@@ -124,7 +127,14 @@ The maximum workers to spawn. Generally if you want to test lock contention, you
    The number of times to run the query. If you use functions inside values, they're computed for each iteration. Iterations are run in parallel if possible (sql-stress has a worker command line option)
    
 ### Property: skip (Bool)
-  Skip this task/step
+  Skip this step
+
+### Property: delay (Int)
+  Time to sleep in miliseconds after this step finishes executing
+
+### Property: predelay (Int)
+  Time to sleep in miliseconds before this step starts executing  
+
 
 
 
