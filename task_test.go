@@ -122,3 +122,32 @@ func TestResolveStringIncrementCount(t *testing.T) {
 		t.Fatalf("Expected incrementingCount to decremement by 1 from %v and equal to %v, is %v", 0, -1, count)
 	}
 }
+
+
+func BenchmarkResolveStringRandIntInclusive(b *testing.B) {
+	s := &Step{}
+	s.Init()
+	
+	for i := 0; i < b.N; i++ {
+		s.resolveString("randIntInclusive(1, 5000000)", 0)
+	}
+}
+
+
+func BenchmarkResolveStringRandString(b *testing.B) {
+	s := &Step{}
+	s.Init()
+	
+	for i := 0; i < b.N; i++ {
+		s.resolveString("randString(1, 300)", 0)
+	}
+}
+
+func BenchmarkResolveStringIncrementingCount(b *testing.B) {
+	s := &Step{}
+	s.Init()
+	
+	for i := 0; i < b.N; i++ {
+		s.resolveString("incrementingCount(1, 1)", 0)
+	}
+}
