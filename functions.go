@@ -9,9 +9,9 @@ import (
 )
 
 var (
-	randIntInclusive = regexp.MustCompile("^randIntInclusive\\((\\d+)+,\\s*(\\d+)+\\)$")
-	randString       = regexp.MustCompile("^randString\\((\\d+)+,\\s*(\\d+)+\\)$")
-	valueFunctions   = [...]*regexp.Regexp{randIntInclusive, randString}
+	randIntInclusive  = regexp.MustCompile("^randIntInclusive\\((\\d+)+,\\s*(\\d+)+\\)$")
+	randString        = regexp.MustCompile("^randString\\((\\d+)+,\\s*(\\d+)+\\)$")
+	valueFunctions    = [...]*regexp.Regexp{randIntInclusive, randString}
 )
 
 func TabN(n int) string {

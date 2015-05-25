@@ -25,7 +25,7 @@ type Conn struct {
 type Task struct {
 	Conn Conn
 	Parallel string
-	Ignore   bool
+	Skip   bool
 	Steps    []Step
 }
 
@@ -35,7 +35,7 @@ type Step struct {
 	Values     []interface{}
 	Iterations int
 	Tables     []string
-	Ignore     bool
+	Skip     bool
 	Chance     float64
 	Run        bool
 }
@@ -57,7 +57,7 @@ func PrintTableInfo(db *sql.DB, table string) {
 
 func (t *Task) Step(db *sql.DB, queryIn chan<- Query) {
 	for _, step := range t.Steps {
-		if step.Ignore {
+		if step.Skip {
 			continue
 		}
 		err := step.Execute(db, queryIn)
@@ -173,7 +173,7 @@ func ProcessTasks(settings *Settings, db *sql.DB, queryIn chan<- Query) {
 			fmt.Println("Cannot continue, exiting")
 			os.Exit(1)
 		}
-		if task.Ignore {
+		if task.Skip {
 			continue
 		}
 

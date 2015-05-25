@@ -113,7 +113,7 @@ If you don't provide conn, the connection info that is passed via command line a
 ### Property: iterations (Integer)
    The number of times to run the query. If you use functions inside values, they're computed for each iteration. Iterations are run in parallel if possible (sql-stress has a worker command line option)
    
-### Property: ignore (Bool)
+### Property: skip (Bool)
   Skip this task/step
 
 
