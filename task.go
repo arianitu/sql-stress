@@ -11,6 +11,7 @@ import (
 	"path"
 	"runtime"
 	"sort"
+	"strconv"
 	"sync"
 	"time"
 )
@@ -38,6 +39,9 @@ type Step struct {
 	Skip       bool
 	Chance     float64
 	Run        bool
+
+	IncrementingCount            map[int]int64 `json:"-"`
+	IncrementingCountInitialized map[int]bool  `json:"-"`
 }
 
 func PrintTableInfo(db *sql.DB, table string) {
@@ -60,12 +64,19 @@ func (t *Task) Step(db *sql.DB, queryIn chan<- Query) {
 		if step.Skip {
 			continue
 		}
+		step.Init()
+
 		err := step.Execute(db, queryIn)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
 		}
 	}
+}
+
+func (s *Step) Init() {
+	s.IncrementingCount = make(map[int]int64)
+	s.IncrementingCountInitialized = make(map[int]bool)
 }
 
 func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
@@ -121,15 +132,62 @@ func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 	return nil
 }
 
+func (s *Step) resolveString(value string, idx int) (interface{}, error) {
+	for _, exp := range valueFunctions {
+		if !exp.MatchString(value) {
+			continue
+		}
+		params := exp.FindStringSubmatch(value)
+
+		if exp == randIntInclusive {
+			min, err := strconv.Atoi(params[1])
+			if err != nil {
+				return nil, fmt.Errorf("First parameter of randIntIncusive must be an integer! Got: %v", params[1])
+			}
+			max, err := strconv.Atoi(params[2])
+			if err != nil {
+				return nil, fmt.Errorf("Second parameter of randIntIncusive must be an integer! Got: %v", params[2])
+			}
+			return RandomIntInclusive(min, max), nil
+		} else if exp == randString {
+			min, err := strconv.Atoi(params[1])
+			if err != nil {
+				return nil, fmt.Errorf("First parameter of randString must be an integer! Got: %v", params[1])
+			}
+			max, err := strconv.Atoi(params[2])
+			if err != nil {
+				return nil, fmt.Errorf("Second parameter of randString must be an integer! Got: %v", params[2])
+			}
+			return RandomString(min, max), nil
+		} else if exp == incrementingCount {
+			_, ok := s.IncrementingCountInitialized[idx]
+			if ok {
+				s.IncrementingCount[idx]++
+				return s.IncrementingCount[idx], nil
+			}
+
+			start, err := strconv.ParseInt(params[1], 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("First parameter of incrementingCount must be an integer (64 bits)! Got: %v", params[1])
+			}
+			s.IncrementingCountInitialized[idx] = true
+			s.IncrementingCount[idx] = start
+
+			return start, nil
+		}
+	}
+	return value, nil
+}
+
 // ResolveValues goes through each Task.Values and computes that
 // requested function if it exists. If that function does not exist,
 // it will return an error.
 func (s *Step) ResolveValues() ([]interface{}, error) {
 	values := make([]interface{}, 0)
-	for _, anything := range s.Values {
+	for idx, anything := range s.Values {
 		switch v := anything.(type) {
 		case string:
-			r, err := resolveString(v)
+			r, err := s.resolveString(v, idx)
 			if err != nil {
 				return nil, err
 			}

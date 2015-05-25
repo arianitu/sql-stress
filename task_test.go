@@ -7,6 +7,7 @@ import (
 func TestResolveValues(t *testing.T) {
 	expectedStrings := []string{"string", "that", "should", "stay", "the", "same", "randString", "randIntInclusive"}
 	s := &Step{}
+	s.Init()
 	for _, val := range expectedStrings {
 		s.Values = append(s.Values, val)
 	}
@@ -30,6 +31,57 @@ func TestResolveValues(t *testing.T) {
 	vals, err = s.ResolveValues()
 	if err == nil {
 		t.Fatalf("expected ResolveValues to only accept string, float64 and bool, but it accepted []string")
+	}
+
+}
+
+func TestResolveString(t *testing.T) {
+	s := &Step{}
+	s.Init()
+	value, err := s.resolveString("randIntInclusive(10, 10)", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
+	_, ok := value.(int)
+	if !ok {
+		t.Fatal("Expected randIntInclusive to return an int!")
+	}
+
+	value, err = s.resolveString("randString(10, 15)", 0)
+	_, ok = value.(string)
+	if !ok {
+		t.Fatal("Expected randString to return a string!")
+	}
+
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	value, err = s.resolveString("incrementingCount(10)", 0)
+	count, ok := value.(int64)
+	if !ok {
+		t.Fatal("Expected incrementingCount to return an int64!")
+	}
+	if count != 10 {
+		t.Fatalf("Expected incrementingCount to return starting count %v got %v", 10, count)
+	}
+
+	value, err = s.resolveString("incrementingCount(10)", 0)
+	count, ok = value.(int64)
+	if !ok {
+		t.Fatal("Expected incrementingCount to return an int64!")
+	}
+	if count != 11 {
+		t.Fatalf("Expected incrementingCount to increment by 1 using the same idx, starting value is %v and now is %v", 10, count)
+	}
+
+	value, err = s.resolveString("incrementingCount(50)", 1)
+	count, ok = value.(int64)
+	if !ok {
+		t.Fatal("Expected incrementingCount to return an int64!")
+	}
+	if count != 50 {
+		t.Fatalf("Expected incrementingCount in a different idx to initialize to %v, but is %v", 50, value)
 	}
 
 }
