@@ -9,7 +9,7 @@ import (
 var (
 	randIntInclusive  = regexp.MustCompile("^randIntInclusive\\((\\d+)+,\\s*(\\d+)+\\)$")
 	randString        = regexp.MustCompile("^randString\\((\\d+)+,\\s*(\\d+)+\\)$")
-	incrementingCount = regexp.MustCompile("^incrementingCount\\((\\d+)+\\)$")
+	incrementingCount = regexp.MustCompile("^incrementingCount\\((\\d+)+,\\s*(-?\\d+)+\\)$")
 
 	valueFunctions = [...]*regexp.Regexp{randIntInclusive, randString, incrementingCount}
 )

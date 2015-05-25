@@ -48,16 +48,24 @@ func TestResolveString(t *testing.T) {
 	}
 
 	value, err = s.resolveString("randString(10, 15)", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
 	_, ok = value.(string)
 	if !ok {
 		t.Fatal("Expected randString to return a string!")
 	}
 
+}
+
+func TestResolveStringIncrementCount(t *testing.T) {
+	s := &Step{}
+	s.Init()
+
+	value, err := s.resolveString("incrementingCount(10, 1)", 0)
 	if err != nil {
 		t.Fatal(err)
 	}
-
-	value, err = s.resolveString("incrementingCount(10)", 0)
 	count, ok := value.(int64)
 	if !ok {
 		t.Fatal("Expected incrementingCount to return an int64!")
@@ -66,7 +74,10 @@ func TestResolveString(t *testing.T) {
 		t.Fatalf("Expected incrementingCount to return starting count %v got %v", 10, count)
 	}
 
-	value, err = s.resolveString("incrementingCount(10)", 0)
+	value, err = s.resolveString("incrementingCount(10, 1)", 0)
+	if err != nil {
+		t.Fatal(err)
+	}
 	count, ok = value.(int64)
 	if !ok {
 		t.Fatal("Expected incrementingCount to return an int64!")
@@ -75,7 +86,10 @@ func TestResolveString(t *testing.T) {
 		t.Fatalf("Expected incrementingCount to increment by 1 using the same idx, starting value is %v and now is %v", 10, count)
 	}
 
-	value, err = s.resolveString("incrementingCount(50)", 1)
+	value, err = s.resolveString("incrementingCount(50, 1)", 1)
+	if err != nil {
+		t.Fatal(err)
+	}
 	count, ok = value.(int64)
 	if !ok {
 		t.Fatal("Expected incrementingCount to return an int64!")
@@ -84,4 +98,27 @@ func TestResolveString(t *testing.T) {
 		t.Fatalf("Expected incrementingCount in a different idx to initialize to %v, but is %v", 50, value)
 	}
 
+	value, err = s.resolveString("incrementingCount(0, -1)", 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	count, ok = value.(int64)
+	if !ok {
+		t.Fatal("Expected incrementingCount to return an int64!")
+	}
+	if count != 0 {
+		t.Fatalf("Expected incrementingCount to start at %v, is %v", 0, count)
+	}
+
+	value, err = s.resolveString("incrementingCount(0, -1)", 2)
+	if err != nil {
+		t.Fatal(err)
+	}
+	count, ok = value.(int64)
+	if !ok {
+		t.Fatal("Expected incrementingCount to return an int64!")
+	}
+	if count != -1 {
+		t.Fatalf("Expected incrementingCount to decremement by 1 from %v and equal to %v, is %v", 0, -1, count)
+	}
 }

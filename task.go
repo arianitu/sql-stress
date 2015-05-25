@@ -160,16 +160,20 @@ func (s *Step) resolveString(value string, idx int) (interface{}, error) {
 			}
 			return RandomString(min, max), nil
 		} else if exp == incrementingCount {
-			_, ok := s.IncrementingCountInitialized[idx]
-			if ok {
-				s.IncrementingCount[idx]++
-				return s.IncrementingCount[idx], nil
-			}
-
 			start, err := strconv.ParseInt(params[1], 10, 64)
 			if err != nil {
 				return nil, fmt.Errorf("First parameter of incrementingCount must be an integer (64 bits)! Got: %v", params[1])
 			}
+			increment, err := strconv.ParseInt(params[2], 10, 64)
+			if err != nil {
+				return nil, fmt.Errorf("Second parameter of incrementingCount must be an integer (64 bits)! Got: %v", params[1])
+			}
+			_, ok := s.IncrementingCountInitialized[idx]
+			if ok {
+				s.IncrementingCount[idx] += increment
+				return s.IncrementingCount[idx], nil
+			}
+
 			s.IncrementingCountInitialized[idx] = true
 			s.IncrementingCount[idx] = start
 
