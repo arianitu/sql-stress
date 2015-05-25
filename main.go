@@ -13,12 +13,12 @@ import (
 )
 
 type Settings struct {
-	Workers int
-	RunFixtures int
+	Workers         int
+	RunFixtures     int
 	FixtureLocation string
-	TaskLocation string
-	Vendor string
-	Url string
+	TaskLocation    string
+	Vendor          string
+	Url             string
 }
 
 func main() {
@@ -38,14 +38,14 @@ func main() {
 
 	var vendor = flag.String("vendor", "mysql", "The sql vendor. Possible values are: mysql, postgres, sqlite")
 	flag.Parse()
-	
-	settings := &Settings {
-		Workers: *workers,
-		RunFixtures: *runFixtures,
+
+	settings := &Settings{
+		Workers:         *workers,
+		RunFixtures:     *runFixtures,
 		FixtureLocation: *fixtureLocation,
-		TaskLocation: *taskLocation,
-		Vendor: *vendor,
-		Url: *url,
+		TaskLocation:    *taskLocation,
+		Vendor:          *vendor,
+		Url:             *url,
 	}
 
 	queryIn, db, err := SpawnWorkers(settings.Vendor, settings.Url, settings.Workers, runtime.NumCPU())
@@ -54,7 +54,7 @@ func main() {
 		fmt.Println("Cannot continue, exiting")
 		os.Exit(1)
 	}
-	
+
 	if *runFixtures == 1 {
 		ProcessFixtures(*fixtureLocation, db)
 	}

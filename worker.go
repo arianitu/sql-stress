@@ -17,7 +17,7 @@ type Query struct {
 func Worker(db *sql.DB, queryIn <-chan Query) {
 	for query := range queryIn {
 		startTime := time.Now()
-		
+
 		// TODO: add debug option that prints queries
 		_, err := db.Exec(query.Query, query.Values...)
 		elapsed := time.Since(startTime)

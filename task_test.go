@@ -25,11 +25,11 @@ func TestResolveValues(t *testing.T) {
 	if err != nil {
 		t.Fatalf("expected ResolveValues to accept string, float64 and bool, but it did not because %v", err)
 	}
-	
-	s = &Step{ Values: []interface{}{[]string{"1", "2", "3"}} }
+
+	s = &Step{Values: []interface{}{[]string{"1", "2", "3"}}}
 	vals, err = s.ResolveValues()
 	if err == nil {
 		t.Fatalf("expected ResolveValues to only accept string, float64 and bool, but it accepted []string")
 	}
-	
+
 }

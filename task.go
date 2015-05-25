@@ -1,7 +1,6 @@
 package main
 
 import (
-	"runtime"
 	"database/sql"
 	"encoding/json"
 	"fmt"
@@ -10,22 +9,23 @@ import (
 	"math"
 	"os"
 	"path"
+	"runtime"
 	"sort"
 	"sync"
 	"time"
 )
 
 type Conn struct {
-	Vendor string
-	Url string
-	Workers int
+	Vendor      string
+	Url         string
+	Workers     int
 	MaxOpenConn int
 }
 
 type Task struct {
-	Conn Conn
+	Conn     Conn
 	Parallel string
-	Skip   bool
+	Skip     bool
 	Steps    []Step
 }
 
@@ -35,7 +35,7 @@ type Step struct {
 	Values     []interface{}
 	Iterations int
 	Tables     []string
-	Skip     bool
+	Skip       bool
 	Chance     float64
 	Run        bool
 }
@@ -76,7 +76,7 @@ func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 	if s.Iterations <= 0 {
 		s.Iterations = 1
 	}
-	
+
 	wg := &sync.WaitGroup{}
 	wg.Add(s.Iterations)
 
@@ -193,7 +193,7 @@ func ProcessTasks(settings *Settings, db *sql.DB, queryIn chan<- Query) {
 				fmt.Println("Cannot continue, exiting")
 				os.Exit(1)
 			}
-			
+
 			task.Step(taskDb, taskQueryIn)
 			// task.Step waits for all queries to complete before continuing, we're safe to close the channel
 			close(taskQueryIn)
