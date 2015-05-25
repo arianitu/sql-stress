@@ -2,6 +2,7 @@ package main
 
 import (
 	"testing"
+	"fmt"
 )
 
 func TestResolveValues(t *testing.T) {
@@ -123,30 +124,37 @@ func TestResolveStringIncrementCount(t *testing.T) {
 	}
 }
 
-
 func BenchmarkResolveStringRandIntInclusive(b *testing.B) {
 	s := &Step{}
 	s.Init()
-	
+
 	for i := 0; i < b.N; i++ {
 		s.resolveString("randIntInclusive(1, 5000000)", 0)
 	}
 }
 
-
-func BenchmarkResolveStringRandString(b *testing.B) {
+func benchmarkResolveStringRandString(n int, b *testing.B) {
 	s := &Step{}
 	s.Init()
 	
+	stringToResolve := fmt.Sprintf("randString(1, %v)", n)
+	b.ResetTimer()
+	
 	for i := 0; i < b.N; i++ {
-		s.resolveString("randString(1, 300)", 0)
+		s.resolveString(stringToResolve, 0)
 	}
+	
 }
+
+func BenchmarkResolveStringRandString10(b *testing.B) { benchmarkResolveStringRandString(10, b)  }
+func BenchmarkResolveStringRandString100(b *testing.B) { benchmarkResolveStringRandString(100, b) }
+func BenchmarkResolveStringRandString1000(b *testing.B) { benchmarkResolveStringRandString(1000, b) }
+func BenchmarkResolveStringRandString10000(b *testing.B) { benchmarkResolveStringRandString(10000, b) }
 
 func BenchmarkResolveStringIncrementingCount(b *testing.B) {
 	s := &Step{}
 	s.Init()
-	
+
 	for i := 0; i < b.N; i++ {
 		s.resolveString("incrementingCount(1, 1)", 0)
 	}
