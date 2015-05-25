@@ -117,6 +117,8 @@ The maximum workers to spawn. Generally if you want to test lock contention, you
   
     randIntInclusive(min, max)
     randString(minStringLength, maxStringLength)
+    incrementingCount(initialCount, increment) Increment can be negative to count downwards,
+    count is unique per value in a query.
     
 ### Property: iterations (Integer)
    The number of times to run the query. If you use functions inside values, they're computed for each iteration. Iterations are run in parallel if possible (sql-stress has a worker command line option)
