@@ -93,6 +93,14 @@ If you don't provide conn, the connection info that is passed via command line a
 - postgres: postgres://username:password@localhost/dbname
 - sqlite: /some/location/test.db
 
+#### maxOpenConn(Int): 
+
+The maximum connections that can be opened to the sql server
+
+#### workers(Int): 
+
+The maximum workers to spawn. Generally if you want to test lock contention, you want maxOpenConn == workers to get the right amount of connections to SQL
+
 ## Steps (Array\<Object\>)
 
 ### Property: tables (Array)
