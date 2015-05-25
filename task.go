@@ -39,6 +39,8 @@ type Step struct {
 	Skip       bool
 	Chance     float64
 	Run        bool
+	Delay      int
+	Predelay   int
 
 	IncrementingCount            map[int]int64 `json:"-"`
 	IncrementingCountInitialized map[int]bool  `json:"-"`
@@ -66,10 +68,16 @@ func (t *Task) Step(db *sql.DB, queryIn chan<- Query) {
 		}
 		step.Init()
 
+		if step.Predelay > 0 {
+			time.Sleep(time.Duration(step.Predelay) * time.Millisecond)
+		}
 		err := step.Execute(db, queryIn)
 		if err != nil {
 			fmt.Println(err)
 			os.Exit(1)
+		}
+		if step.Delay > 0 {
+			time.Sleep(time.Duration(step.Delay) * time.Millisecond)
 		}
 	}
 }
@@ -82,7 +90,6 @@ func (s *Step) Init() {
 func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 
 	fmt.Println(TabN(1) + s.Name)
-
 	// iterations default value is 1
 	if s.Iterations <= 0 {
 		s.Iterations = 1
