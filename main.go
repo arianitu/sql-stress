@@ -29,11 +29,11 @@ func main() {
 	var runFixtures = flag.Int("run-fixtures", 1, "If we should run fixtures")
 	var fixtureLocation = flag.String("fixture-location", "./fixtures", "The location of fixtures")
 	var taskLocation = flag.String("task-location", "./tasks", "The location of tasks")
+	var run = flag.String("run", "", "Run a specific task. Example: tasks/task_1.json (requires full path, or relative to where you're running the binary)")
 	var url = flag.String("url", "root:@/sql_stress_test", ` A database url. 
     mysql: username:password@localhost/dbname
     postgres: postgres://username:password@localhost/dbname
     sqlite: /some/location/test.db
-
 `)
 
 	var vendor = flag.String("vendor", "mysql", "The sql vendor. Possible values are: mysql, postgres, sqlite")
@@ -65,7 +65,12 @@ func main() {
 	if *runFixtures == 1 {
 		ProcessFixtures(*fixtureLocation, db)
 	}
-
-	ProcessTasks(settings, db, queryIn)
+	if *run != "" {
+		t := &Task{}
+		t.Execute(*run, settings, db, queryIn)
+	} else {
+		ProcessTasks(settings, db, queryIn)
+	}
+	
 	fmt.Println("Done!")
 }

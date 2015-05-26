@@ -61,6 +61,62 @@ func PrintTableInfo(db *sql.DB, table string) {
 		s.GetRows())
 }
 
+func (t *Task) Execute(path string, settings *Settings, db *sql.DB, queryIn chan<- Query) {
+	fileInfo, err := os.Stat(path)
+	if err != nil {
+		fmt.Println(err)
+		os.Exit(1)
+	}
+	
+	fmt.Printf("Processing task: %s \n", fileInfo.Name())
+	file, err := os.Open(path)
+	if err != nil {
+		fmt.Println(err)
+		fmt.Println("Cannot continue, exiting")
+		os.Exit(1)
+	}
+
+	err = json.NewDecoder(file).Decode(t)
+	if err != nil && err != io.EOF {
+		fmt.Println(err)
+		fmt.Println("Cannot continue, exiting")
+		os.Exit(1)
+	}
+	if t.Skip {
+		return
+	}
+
+	// The task specified a db, we'll use the task db instead of the default one.
+	if t.Conn.Vendor != "" {
+		workers := t.Conn.Workers
+		if workers <= 0 {
+			workers = settings.Workers
+		}
+		maxOpenConn := t.Conn.MaxOpenConn
+		if maxOpenConn <= 0 {
+			maxOpenConn = runtime.NumCPU()
+		}
+		taskQueryIn, taskDb, err := SpawnWorkers(t.Conn.Vendor, t.Conn.Url, workers, maxOpenConn)
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println("Cannot continue, exiting")
+			os.Exit(1)
+		}
+
+		t.Step(taskDb, taskQueryIn)
+		// task.Step waits for all queries to complete before continuing, we're safe to close the channel
+		close(taskQueryIn)
+		err = taskDb.Close()
+		if err != nil {
+			fmt.Println(err)
+			fmt.Println("Cannot continue, exiting")
+			os.Exit(1)				
+		}
+	} else {
+		t.Step(db, queryIn)
+	}	
+}
+
 func (t *Task) Step(db *sql.DB, queryIn chan<- Query) {
 	for _, step := range t.Steps {
 		if step.Skip {
@@ -229,53 +285,9 @@ func ProcessTasks(settings *Settings, db *sql.DB, queryIn chan<- Query) {
 		if fileInfo.IsDir() {
 			continue
 		}
-		fmt.Printf("Processing task: %s \n", fileInfo.Name())
-		file, err := os.Open(path.Join(settings.TaskLocation, fileInfo.Name()))
-		if err != nil {
-			fmt.Println(err)
-			fmt.Println("Cannot continue, exiting")
-			os.Exit(1)
-		}
-
-		var task Task
-		err = json.NewDecoder(file).Decode(&task)
-		if err != nil && err != io.EOF {
-			fmt.Println(err)
-			fmt.Println("Cannot continue, exiting")
-			os.Exit(1)
-		}
-		if task.Skip {
-			continue
-		}
-
-		// The task specified a db, we'll use the task db instead of the default one.
-		if task.Conn.Vendor != "" {
-			workers := task.Conn.Workers
-			if workers <= 0 {
-				workers = settings.Workers
-			}
-			maxOpenConn := task.Conn.MaxOpenConn
-			if maxOpenConn <= 0 {
-				maxOpenConn = runtime.NumCPU()
-			}
-			taskQueryIn, taskDb, err := SpawnWorkers(task.Conn.Vendor, task.Conn.Url, workers, maxOpenConn)
-			if err != nil {
-				fmt.Println(err)
-				fmt.Println("Cannot continue, exiting")
-				os.Exit(1)
-			}
-
-			task.Step(taskDb, taskQueryIn)
-			// task.Step waits for all queries to complete before continuing, we're safe to close the channel
-			close(taskQueryIn)
-			err = taskDb.Close()
-			if err != nil {
-				fmt.Println(err)
-				fmt.Println("Cannot continue, exiting")
-				os.Exit(1)				
-			}
-		} else {
-			task.Step(db, queryIn)
-		}
+		
+		taskPath := path.Join(settings.TaskLocation, fileInfo.Name())
+		t := &Task{}
+		t.Execute(taskPath, settings, db, queryIn)
 	}
 }
