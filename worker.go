@@ -39,6 +39,7 @@ func SpawnWorkers(vendor string, url string, workers int, maxOpenConn int) (chan
 	}
 
 	db.SetMaxOpenConns(maxOpenConn)
+	db.SetMaxIdleConns(maxOpenConn)
 	for i := 0; i < workers; i++ {
 		go Worker(db, queryIn)
 	}
