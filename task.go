@@ -115,7 +115,8 @@ func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 			wg.Done()
 		}
 	}()
-
+	
+	now := time.Now()
 	for i := 0; i < s.Iterations; i++ {
 		values, err := s.ResolveValues()
 		if err != nil {
@@ -124,13 +125,14 @@ func (s *Step) Execute(db *sql.DB, queryIn chan<- Query) error {
 		queryIn <- Query{Query: s.Query, Values: values, Done: sink}
 	}
 	wg.Wait()
-
+	
+	qps := float64(s.Iterations) / time.Since(now).Seconds()
 	total := time.Duration(totalTime) * time.Nanosecond
 	avgDuration := time.Duration(totalTime/int64(s.Iterations)) * time.Nanosecond
 	bestDuration := time.Duration(best) * time.Nanosecond
 	worstDuration := time.Duration(worst) * time.Nanosecond
 
-	fmt.Printf(TabN(2)+"Avg: %v Worst: %v Best: %v Total: %v \n", avgDuration, worstDuration, bestDuration, total)
+	fmt.Printf(TabN(2)+"Qps: %.2f Avg: %v Worst: %v Best: %v Total: %v \n", qps, avgDuration, worstDuration, bestDuration, total)
 	fmt.Println("")
 	for _, table := range s.Tables {
 		PrintTableInfo(db, table)
