@@ -49,6 +49,13 @@ func main() {
 	}
 
 	queryIn, db, err := SpawnWorkers(settings.Vendor, settings.Url, settings.Workers, runtime.NumCPU())
+	defer func() {
+		err = db.Close()
+		if err != nil {
+			fmt.Println(err)
+		}
+	}()
+	
 	if err != nil {
 		fmt.Println(err)
 		fmt.Println("Cannot continue, exiting")

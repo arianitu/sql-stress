@@ -268,7 +268,12 @@ func ProcessTasks(settings *Settings, db *sql.DB, queryIn chan<- Query) {
 			task.Step(taskDb, taskQueryIn)
 			// task.Step waits for all queries to complete before continuing, we're safe to close the channel
 			close(taskQueryIn)
-			taskDb.Close()
+			err = taskDb.Close()
+			if err != nil {
+				fmt.Println(err)
+				fmt.Println("Cannot continue, exiting")
+				os.Exit(1)				
+			}
 		} else {
 			task.Step(db, queryIn)
 		}
