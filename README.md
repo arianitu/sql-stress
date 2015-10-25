@@ -12,18 +12,18 @@ You want to know how your queries scale when you get to 10+ million rows. How lo
 # Example output
 
 	Insert 1,000,000 random integers
-		Qps: 15109.01 Avg: 653.401µs Worst: 77.858761ms Best: 292µs 
+		Qps: 16970.22 Avg: 583.479µs Worst: 62.636873ms Best: 279.093µs  
 
 		Table: my_test_table
-			table size: 72 MB, index size: 41 MB, avg row size: 38 bytes, rows: 1916000 
+			table size: 37 MB, index size: 22 MB, avg row size: 36 bytes, rows: 1016610 
 	Insert 1,000,000 strings
-		Qps: 14573.15 Avg: 677.945µs Worst: 189.963407ms Best: 296.093µs 
+		Qps: 16552.41 Avg: 595.991µs Worst: 49.696598ms Best: 302.531µs 
 
 		Table: my_test_table_2
-			table size: 138 MB, index size: 150 MB, avg row size: 69 bytes, rows: 1993310 
+			table size: 69 MB, index size: 75 MB, avg row size: 69 bytes, rows: 1001345 
 
 
-Notice that rows is close, but not exact. This is because these stats are pulled from "show table status" to get speedy results.
+Notice that rows is close, but not exact. This is because table stats are pulled from "show table status" (Note: ANALYZE TABLE is run on the table before SHOW TABLE STATUS for accuracy)
 
 
 
