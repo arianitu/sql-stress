@@ -10,18 +10,18 @@ Stress a SQL server by defining tasks using JSON. It currently supports mysql, p
 You want to know how your queries scale when you get to 10+ million rows. How long do inserts take? How long do selects take? How big is my table (in terms of disk space) in the worse case? How big are my indexes? (in terms of disk space)
 
 # Example output
-    Processing task: task_1.json
-	Insert 300,000 random integers
-		Avg: 1.308625ms Worst: 140.21674ms Best: 511.712µs Total: 6m32.587658685s 
+
+	Insert 1,000,000 random integers
+		Qps: 15109.01 Avg: 653.401µs Worst: 77.858761ms Best: 292µs 
 
 		Table: my_test_table
-			table size: 9 MB, index size: 0 MB, avg row size: 33 bytes, rows: 299730 
-			
-	Insert 300,000 strings
-		Avg: 1.496862ms Worst: 35.539345ms Best: 629.338µs Total: 7m29.058658422s 
+			table size: 72 MB, index size: 41 MB, avg row size: 38 bytes, rows: 1916000 
+	Insert 1,000,000 strings
+		Qps: 14573.15 Avg: 677.945µs Worst: 189.963407ms Best: 296.093µs 
 
 		Table: my_test_table_2
-			table size: 19 MB, index size: 19 MB, avg row size: 65 bytes, rows: 298730 
+			table size: 138 MB, index size: 150 MB, avg row size: 69 bytes, rows: 1993310 
+
 
 Notice that rows is close, but not exact. This is because these stats are pulled from "show table status" to get speedy results.
 
