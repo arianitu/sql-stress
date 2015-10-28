@@ -29,7 +29,7 @@ Notice that rows is close, but not exact. This is because table stats are pulled
 
 # Fixtures
 
-Fixtures are basically .sql files that run in order. This is where you would put your table definitions in. You must have a folder named fixtures in the directory that you're running sql-stress.
+Fixtures are basically .sql files that run in order. This is where you would put your table definitions in. You must have a folder named fixtures in the directory that you're running sql-stress (if you don't want to run fixtures, use the command line option -run-fixtures=0)
 
 The file names inside the fixtures folder should be in the format: name_order. Name must be a string, and order must be an integer.
 
