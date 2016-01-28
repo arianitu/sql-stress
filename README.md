@@ -1,7 +1,3 @@
-# Notice
-
-This is unstable and is in heavy development. 
-
 # sql-stress
 Stress a SQL server by defining tasks using JSON. It currently supports mysql, postgres, and sqlite. 
 
